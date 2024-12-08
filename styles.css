@@ -1,0 +1,194 @@
+/* Reset básico para garantir consistência */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Corpo da página */
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f1f1f1; /* Fundo suave */
+  color: #333; /* Cor de texto */
+  text-align: center;
+  padding: 20px;
+  line-height: 1.6;
+}
+
+/* Títulos principais */
+h1 {
+  color: #d24b4b; /* Vermelho Natalício */
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+/* Estilo para as perguntas */
+p {
+  font-size: 1.2rem;
+  margin: 15px 0;
+}
+
+/* Formulários */
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+input[type="text"] {
+  padding: 10px;
+  font-size: 1rem;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  width: 80%;
+  max-width: 300px;
+}
+
+input[type="text"]:focus {
+  border-color: #d24b4b;
+  outline: none;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  background-color: #d24b4b;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #a73c3c; /* Cor mais escura ao passar o rato */
+}
+
+button:active {
+  background-color: #862c2c; /* Cor quando o botão é clicado */
+}
+
+/* Página final */
+button {
+  margin-top: 30px;
+}
+
+/* Estilo para as mensagens de sucesso ou erro */
+.alert {
+  background-color: #f9e0e0;
+  color: #e94c4c;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 20px auto;
+  width: 80%;
+  max-width: 400px;
+  font-weight: bold;
+}
+
+/* Estilo para o fundo das páginas */
+body {
+  background-color: #f9f9f9;
+}
+
+.container {
+  margin: 20px;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Layout responsivo: Para dispositivos móveis */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+  
+  p {
+    font-size: 1rem;
+  }
+
+  input[type="text"] {
+    width: 90%;
+  }
+
+  button {
+    width: 80%;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+
+
+.prenda-link {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #4CAF50; /* Cor do fundo do botão */
+  color: white;
+  text-align: center;
+  text-decoration: none; /* Remove o sublinhado */
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.prenda-link:hover {
+  background-color: #45a049; /* Cor do botão quando o cursor passa por cima */
+}
+
+
+
+
+
+
+/* Estilo para o container do jogo */
+.start-container {
+    text-align: center;
+    margin: 20px 0;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.royal-match-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #f0f0f0;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(8, 60px);
+    grid-gap: 5px;
+    margin: 20px auto;
+    justify-content: center;
+}
+
+.game-board div {
+    width: 60px;
+    height: 60px;
+    background: #ddd;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}

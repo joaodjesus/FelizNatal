@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Parabéns!</title>
+</head>
+
+<body>
+    <h1>Desafio final</h1>
+
+    <!-- jogo -->
+    <div class="start-container">
+        <button id="start-challenge">Iniciar desafio</button>
+    </div>
+
+    <div class="royal-match-container" style="display: none;">
+        <header class="game-header">
+            <h2>Consegues 3000 pontos???</h2>
+            <div class="game-score">
+                <span>Pontuação: </span><span id="score">0</span>
+            </div>
+            <div class="game-moves">
+                <span>Jogadas restantes: </span><span id="moves">20</span>
+            </div>
+        </header>
+        <div class="game-board"></div>
+        <div class="game-controls">
+            <button id="restart">Recomeçar Jogo</button>
+        </div>
+    </div>
+
+
+    <p id="mensagemErro" class="alert hidden">Vamos lá!!!</p>
+    <p id="mensagemSucesso" class="success hidden">Resposta correta! A avançar...</p>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
