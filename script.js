@@ -70,7 +70,7 @@ function avancarParaProximaPagina(currentPage) {
 
 // game.js
 
-const boardSize = 8;
+const boardSize = 6;
 const colors = ['#e74c3c', '#f39c12', '#2ecc71', '#3498db', '#9b59b6'];
 let board = [];
 let score = 0;
