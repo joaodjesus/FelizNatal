@@ -61,3 +61,5 @@ function avancarParaProximaPagina(currentPage) {
     window.location.href = nextPage;
   }
 }
+
+

@@ -173,3 +173,8 @@ function animateAndReplacePiece(row, col) {
         piece.style.backgroundColor = getRandomColor();
     }, 300);
 }
+
+
+
+
+
