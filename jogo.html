@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Gem Matching Game</title>
+<style>
+body {
+  text-align: center;
+}
+
+#game-board {
+  display: grid;
+  grid-template-columns: repeat(4, 100px);
+  grid-gap: 10px;
+  margin: 20px auto;
+}
+
+.gem {
+  width: 90px;
+  height: 90px;
+  border-radius: 5px;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+}
+
+#score {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+#message {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+#ok-button {
+  display: block;
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<h1>Gem Matching Game</h1>
+
+<div id="game-board"></div>
+
+<p id="score">Score: 0</p>
+
+<div id="message">
+  <h2>ÉS UM ESPANTO 😘</h2>
+  <button id="ok-button">OK</button>
+</div>
+
+<script>
+const gameBoard = document.getElementById('game-board');
+const scoreDisplay = document.getElementById('score');
+const message = document.getElementById('message');
+const okButton = document.getElementById('ok-button');
+
+let firstGem, secondGem;
+let score = 0;
+
+const gemImages = [
+  'url(images/red-candy.png)',
+    'url(images/yellow-candy.png)',
+    'url(images/orange-candy.png)',
+    'url(images/purple-candy.png)',
+    'url(images/green-candy.png)',
+    'url(images/blue-candy.png)'
+];
+
+// Create a shuffled array of gem pairs
+const gems = [...gemImages, ...gemImages].sort(() => Math.random() - 0.5);
+
+// Create gem elements and add them to the game board
+for (let i = 0; i < gems.length; i++) {
+  const gem = document.createElement('div');
+  gem.classList.add('gem');
+  gem.style.backgroundImage = `url('${gems[i]}')`;
+  gem.addEventListener('click', () => handleGemClick(gem));
+  gameBoard.appendChild(gem);
+}
+
+function handleGemClick(gem) {
+  if (!firstGem) {
+    firstGem = gem;
+    firstGem.classList.add('selected');
+  } else if (secondGem) {
+    return; // Ignore clicks if two gems are already selected
+  } else {
+    secondGem = gem;
+    secondGem.classList.add('selected');
+
+    if (firstGem.style.backgroundImage === secondGem.style.backgroundImage) {
+      score++;
+      scoreDisplay.textContent = `Score: ${score}`;
+
+      firstGem.classList.remove('gem', 'selected');
+      secondGem.classList.remove('gem', 'selected');
+      firstGem.style.visibility = 'hidden';
+      secondGem.style.visibility = 'hidden';
+
+      firstGem = null;
+      secondGem = null;
+
+      if (score === 8) { // All pairs matched
+        message.style.display = 'block';
+      }
+    } else {
+      setTimeout(() => {
+        firstGem.classList.remove('selected');
+        secondGem.classList.remove('selected');
+        firstGem = null;
+        secondGem = null;
+      }, 500);
+    }
+  }
+}
+
+okButton.addEventListener('click', () => {
+  window.location.href = 'pagina8.html';
+});
+</script>
+
+</body>
+</html>

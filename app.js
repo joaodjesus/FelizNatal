@@ -11,62 +11,64 @@ document.addEventListener('DOMContentLoaded', () => {
     'url(images/orange-candy.png)',
     'url(images/purple-candy.png)',
     'url(images/green-candy.png)',
-    'url(images/blue-candy.png)'
+    'url(images/blue-candy.png)',
   ];
 
-  // Cria o tabuleiro
+  // Criação do tabuleiro
   function createBoard() {
     for (let i = 0; i < width * width; i++) {
       const square = document.createElement('div');
       square.setAttribute('id', i);
-      let randomColor = Math.floor(Math.random() * candyColors.length);
+      const randomColor = Math.floor(Math.random() * candyColors.length);
       square.style.backgroundImage = candyColors[randomColor];
       grid.appendChild(square);
       squares.push(square);
 
-      // Adicionar eventos de toque e mouse
-      square.addEventListener('touchstart', touchStart);
-      square.addEventListener('touchmove', touchMove);
-      square.addEventListener('touchend', touchEnd);
+      // Adicionar eventos para toque
+      square.addEventListener('touchstart', handleTouchStart, { passive: false });
+      square.addEventListener('touchmove', handleTouchMove, { passive: false });
+      square.addEventListener('touchend', handleTouchEnd, { passive: false });
     }
   }
   createBoard();
 
-  // Variáveis para toque
   let startX, startY, startSquareId, endSquareId;
 
-  function touchStart(e) {
-    e.preventDefault();
-    const touch = e.touches[0];
+  function handleTouchStart(event) {
+    event.preventDefault();
+    const touch = event.touches[0];
     startX = touch.clientX;
     startY = touch.clientY;
-    startSquareId = parseInt(e.target.id);
+    startSquareId = parseInt(event.target.id);
   }
 
-  function touchMove(e) {
-    e.preventDefault();
-    // Não faz nada aqui para evitar ações não desejadas
+  function handleTouchMove(event) {
+    event.preventDefault();
   }
 
-  function touchEnd(e) {
-    e.preventDefault();
-    const touch = e.changedTouches[0];
+  function handleTouchEnd(event) {
+    event.preventDefault();
+    const touch = event.changedTouches[0];
     const endX = touch.clientX;
     const endY = touch.clientY;
 
     const deltaX = endX - startX;
     const deltaY = endY - startY;
 
-    // Determinar direção do movimento
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      // Movimento horizontal
+      // Horizontal swipe
       endSquareId = deltaX > 0 ? startSquareId + 1 : startSquareId - 1;
     } else {
-      // Movimento vertical
+      // Vertical swipe
       endSquareId = deltaY > 0 ? startSquareId + width : startSquareId - width;
     }
 
-    // Verificar se o movimento é válido
+    if (endSquareId >= 0 && endSquareId < width * width) {
+      swapSquares();
+    }
+  }
+
+  function swapSquares() {
     const validMoves = [
       startSquareId - 1,
       startSquareId + 1,
@@ -74,93 +76,51 @@ document.addEventListener('DOMContentLoaded', () => {
       startSquareId + width,
     ];
 
-    if (validMoves.includes(endSquareId) && endSquareId >= 0 && endSquareId < width * width) {
-      const colorBeingDragged = squares[startSquareId].style.backgroundImage;
-      const colorBeingReplaced = squares[endSquareId].style.backgroundImage;
+    if (validMoves.includes(endSquareId)) {
+      const colorDragged = squares[startSquareId].style.backgroundImage;
+      const colorReplaced = squares[endSquareId].style.backgroundImage;
 
-      // Trocar cores
-      squares[endSquareId].style.backgroundImage = colorBeingDragged;
-      squares[startSquareId].style.backgroundImage = colorBeingReplaced;
+      squares[startSquareId].style.backgroundImage = colorReplaced;
+      squares[endSquareId].style.backgroundImage = colorDragged;
 
-      // Validar e verificar matches
       setTimeout(() => {
-        checkRowForFour();
-        checkColumnForFour();
-        checkRowForThree();
-        checkColumnForThree();
+        checkMatches();
         moveIntoSquareBelow();
       }, 100);
     }
   }
 
-  // Atualizar pontuação
   function updateScore(points) {
     score += points;
     scoreDisplay.innerHTML = score;
-
-    if (score >= 50) {
-      alert("ÉS UM ESPANTO 😘");
-      window.location.href = 'pagina8.html';
-    }
   }
 
-  // Move candies para baixo
   function moveIntoSquareBelow() {
-    for (let i = 0; i < 55; i++) {
+    for (let i = 0; i < width * (width - 1); i++) {
       if (squares[i + width].style.backgroundImage === '') {
         squares[i + width].style.backgroundImage = squares[i].style.backgroundImage;
         squares[i].style.backgroundImage = '';
-        const firstRow = [0, 1, 2, 3, 4, 5, 6, 7];
-        const isFirstRow = firstRow.includes(i);
-        if (isFirstRow && squares[i].style.backgroundImage === '') {
-          let randomColor = Math.floor(Math.random() * candyColors.length);
+        const firstRow = Array.from({ length: width }, (_, idx) => idx);
+        if (firstRow.includes(i) && squares[i].style.backgroundImage === '') {
+          const randomColor = Math.floor(Math.random() * candyColors.length);
           squares[i].style.backgroundImage = candyColors[randomColor];
         }
       }
     }
   }
 
-  // Verificações de matches
-  function checkRowForFour() {
-    for (let i = 0; i < 60; i++) {
-      let rowOfFour = [i, i + 1, i + 2, i + 3];
-      let decidedColor = squares[i].style.backgroundImage;
-      const isBlank = squares[i].style.backgroundImage === '';
-
-      const notValid = [5, 6, 7, 13, 14, 15, 21, 22, 23, 29, 30, 31, 37, 38, 39, 45, 46, 47, 53, 54, 55];
-      if (notValid.includes(i)) continue;
-
-      if (rowOfFour.every(index => squares[index].style.backgroundImage === decidedColor && !isBlank)) {
-        updateScore(4);
-        rowOfFour.forEach(index => {
-          squares[index].style.backgroundImage = '';
-        });
-      }
-    }
-  }
-
-  function checkColumnForFour() {
-    for (let i = 0; i < 39; i++) {
-      let columnOfFour = [i, i + width, i + width * 2, i + width * 3];
-      let decidedColor = squares[i].style.backgroundImage;
-      const isBlank = squares[i].style.backgroundImage === '';
-
-      if (columnOfFour.every(index => squares[index].style.backgroundImage === decidedColor && !isBlank)) {
-        updateScore(4);
-        columnOfFour.forEach(index => {
-          squares[index].style.backgroundImage = '';
-        });
-      }
-    }
+  function checkMatches() {
+    checkRowForThree();
+    checkColumnForThree();
   }
 
   function checkRowForThree() {
-    for (let i = 0; i < 61; i++) {
-      let rowOfThree = [i, i + 1, i + 2];
-      let decidedColor = squares[i].style.backgroundImage;
+    for (let i = 0; i < width * width - 2; i++) {
+      const rowOfThree = [i, i + 1, i + 2];
+      const decidedColor = squares[i].style.backgroundImage;
       const isBlank = squares[i].style.backgroundImage === '';
 
-      const notValid = [6, 7, 14, 15, 22, 23, 30, 31, 38, 39, 46, 47, 54, 55];
+      const notValid = Array.from({ length: width }, (_, idx) => width - 2 + idx * width);
       if (notValid.includes(i)) continue;
 
       if (rowOfThree.every(index => squares[index].style.backgroundImage === decidedColor && !isBlank)) {
@@ -173,9 +133,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function checkColumnForThree() {
-    for (let i = 0; i < 47; i++) {
-      let columnOfThree = [i, i + width, i + width * 2];
-      let decidedColor = squares[i].style.backgroundImage;
+    for (let i = 0; i < width * (width - 2); i++) {
+      const columnOfThree = [i, i + width, i + width * 2];
+      const decidedColor = squares[i].style.backgroundImage;
       const isBlank = squares[i].style.backgroundImage === '';
 
       if (columnOfThree.every(index => squares[index].style.backgroundImage === decidedColor && !isBlank)) {
@@ -187,12 +147,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Verificações contínuas
-  window.setInterval(function () {
-    checkRowForFour();
-    checkColumnForFour();
-    checkRowForThree();
-    checkColumnForThree();
+  setInterval(() => {
+    checkMatches();
     moveIntoSquareBelow();
-  }, 100);
+  }, 200);
 });
