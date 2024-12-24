@@ -1,180 +1,186 @@
-const boardSize = 6;
-const colors = ['#e74c3c', '#f39c12', '#2ecc71', '#3498db', '#9b59b6'];
-let board = [];
-let score = 0;
-let movesLeft = 10;
-let isPlaying = false;
-let selectedPiece = null;
+document.addEventListener('DOMContentLoaded', () => {
+  const grid = document.querySelector('.grid');
+  const scoreDisplay = document.getElementById('score');
+  const width = 8;
+  const squares = [];
+  let score = 0;
 
-document.getElementById('start-button').addEventListener('click', initializeGame);
-document.getElementById('popup-close').addEventListener('click', startGame);
+  const candyColors = [
+    'url(images/red-candy.png)',
+    'url(images/yellow-candy.png)',
+    'url(images/orange-candy.png)',
+    'url(images/purple-candy.png)',
+    'url(images/green-candy.png)',
+    'url(images/blue-candy.png)'
+  ];
 
-// Inicializar o jogo
-function initializeGame() {
-    document.getElementById('intro-container').style.display = 'none';
-    document.getElementById('popup-container').style.display = 'block';
-}
+  // Cria o tabuleiro
+  function createBoard() {
+    for (let i = 0; i < width * width; i++) {
+      const square = document.createElement('div');
+      square.setAttribute('draggable', true);
+      square.setAttribute('id', i);
+      let randomColor = Math.floor(Math.random() * candyColors.length);
+      square.style.backgroundImage = candyColors[randomColor];
+      grid.appendChild(square);
+      squares.push(square);
 
-// Começar o jogo
-function startGame() {
-    isPlaying = true;
-    document.getElementById('popup-container').style.display = 'none';
-    document.getElementById('game-container').style.display = 'block';
-    createBoard();
-    updateScore();
-    updateMoves();
-}
-
-// Criar o tabuleiro
-function createBoard() {
-    const boardContainer = document.querySelector('.game-board');
-    boardContainer.innerHTML = '';
-    board = [];
-
-    for (let row = 0; row < boardSize; row++) {
-        let rowArray = [];
-        for (let col = 0; col < boardSize; col++) {
-            const color = getRandomColor();
-            rowArray.push(color);
-
-            const piece = document.createElement('div');
-            piece.classList.add('piece');
-            piece.style.backgroundColor = color;
-            piece.dataset.row = row;
-            piece.dataset.col = col;
-
-            piece.addEventListener('click', () => handlePieceClick(row, col));
-            boardContainer.appendChild(piece);
-        }
-        board.push(rowArray);
+      // Add touch support
+      square.addEventListener('touchstart', touchStart);
+      square.addEventListener('touchmove', touchMove);
+      square.addEventListener('touchend', touchEnd);
     }
-}
+  }
+  createBoard();
 
-// Obter uma cor aleatória
-function getRandomColor() {
-    return colors[Math.floor(Math.random() * colors.length)];
-}
+  // Atualiza o score e verifica redirecionamento
+  function updateScore(points) {
+    score += points;
+    scoreDisplay.innerHTML = score;
 
-// Atualizar pontuação
-function updateScore() {
-    document.getElementById('score').textContent = score;
-}
-
-// Atualizar jogadas restantes
-function updateMoves() {
-    document.getElementById('moves').textContent = movesLeft;
-    if (movesLeft <= 0) {
-        endGame();
+    if (score >= 50) {
+      alert("ÉS UM ESPANTO 😘");
+      window.location.href = 'pagina8.html';
     }
-}
+  }
 
-// Fim de jogo
-function endGame() {
-    if (score >= 3000) {
-        alert('Parabéns! Você venceu!');
+  // Dragging the Candy
+  let colorBeingDragged;
+  let colorBeingReplaced;
+  let squareIdBeingDragged;
+  let squareIdBeingReplaced;
+
+  // Add touch variables
+  let startX, startY, endX, endY;
+
+  squares.forEach(square => square.addEventListener('dragstart', dragStart));
+  squares.forEach(square => square.addEventListener('dragend', dragEnd));
+  squares.forEach(square => square.addEventListener('dragover', dragOver));
+  squares.forEach(square => square.addEventListener('dragenter', dragEnter));
+  squares.forEach(square => square.addEventListener('dragleave', dragLeave));
+  squares.forEach(square => square.addEventListener('drop', dragDrop));
+
+  function dragStart() {
+    colorBeingDragged = this.style.backgroundImage;
+    squareIdBeingDragged = parseInt(this.id);
+  }
+
+  function dragOver(e) {
+    e.preventDefault();
+  }
+
+  function dragEnter(e) {
+    e.preventDefault();
+  }
+
+  function dragLeave() {
+    this.style.backgroundImage = '';
+  }
+
+  function dragDrop() {
+    colorBeingReplaced = this.style.backgroundImage;
+    squareIdBeingReplaced = parseInt(this.id);
+    this.style.backgroundImage = colorBeingDragged;
+    squares[squareIdBeingDragged].style.backgroundImage = colorBeingReplaced;
+  }
+
+  function dragEnd() {
+    let validMoves = [
+      squareIdBeingDragged - 1,
+      squareIdBeingDragged - width,
+      squareIdBeingDragged + 1,
+      squareIdBeingDragged + width
+    ];
+    let validMove = validMoves.includes(squareIdBeingReplaced);
+
+    if (squareIdBeingReplaced && validMove) {
+      squareIdBeingReplaced = null;
+    } else if (squareIdBeingReplaced && !validMove) {
+      squares[squareIdBeingReplaced].style.backgroundImage = colorBeingReplaced;
+      squares[squareIdBeingDragged].style.backgroundImage = colorBeingDragged;
     } else {
-        alert('Confia Joca, tu consegues 😘');
-        resetGame();
+      squares[squareIdBeingDragged].style.backgroundImage = colorBeingDragged;
     }
-}
+  }
 
-// Resetar o jogo
-function resetGame() {
-    score = 0;
-    movesLeft = 10;
-    createBoard();
-    updateScore();
-    updateMoves();
-}
+  // Touch Handlers
+  function touchStart(e) {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    const square = e.target;
+    colorBeingDragged = square.style.backgroundImage;
+    squareIdBeingDragged = parseInt(square.id);
+  }
 
-// Ação quando clicar numa peça
-function handlePieceClick(row, col) {
-    if (!isPlaying) return;
+  function touchMove(e) {
+    endX = e.touches[0].clientX;
+    endY = e.touches[0].clientY;
+  }
 
-    if (selectedPiece) {
-        const prevRow = selectedPiece.row;
-        const prevCol = selectedPiece.col;
+  function touchEnd(e) {
+    const deltaX = endX - startX;
+    const deltaY = endY - startY;
+    const absDeltaX = Math.abs(deltaX);
+    const absDeltaY = Math.abs(deltaY);
 
-        // Verifica se é possível trocar as peças
-        if (isValidMove(prevRow, prevCol, row, col)) {
-            swapPieces(prevRow, prevCol, row, col);
-            if (checkMatch(row, col) || checkMatch(prevRow, prevCol)) {
-                score += 100;
-                movesLeft--;
-                updateScore();
-                updateMoves();
-                animateAndReplacePiece(prevRow, prevCol);
-                animateAndReplacePiece(row, col);
-            } else {
-                setTimeout(() => {
-                    swapPieces(prevRow, prevCol, row, col, true);
-                }, 500);
-            }
-        }
-        selectedPiece = null;
+    // Determine direction
+    if (absDeltaX > absDeltaY) {
+      // Horizontal Swipe
+      squareIdBeingReplaced = deltaX > 0 ? squareIdBeingDragged + 1 : squareIdBeingDragged - 1;
     } else {
-        selectedPiece = { row, col };
+      // Vertical Swipe
+      squareIdBeingReplaced = deltaY > 0 ? squareIdBeingDragged + width : squareIdBeingDragged - width;
     }
-}
 
-// Validar se a troca de peças é válida
-function isValidMove(prevRow, prevCol, row, col) {
-    return (Math.abs(prevRow - row) === 1 && prevCol === col) || (Math.abs(prevCol - col) === 1 && prevRow === row);
-}
-
-// Trocar as peças
-function swapPieces(row1, col1, row2, col2, reset = false) {
-    const tempColor = board[row1][col1];
-    board[row1][col1] = board[row2][col2];
-    board[row2][col2] = tempColor;
-
-    document.querySelector(`[data-row='${row1}'][data-col='${col1}']`).style.backgroundColor = board[row1][col1];
-    document.querySelector(`[data-row='${row2}'][data-col='${col2}']`).style.backgroundColor = board[row2][col2];
-
-    if (reset) {
-        // Se for um movimento inválido, volta às cores originais
-        setTimeout(() => {
-            document.querySelector(`[data-row='${row1}'][data-col='${col1}']`).style.backgroundColor = tempColor;
-            document.querySelector(`[data-row='${row2}'][data-col='${col2}']`).style.backgroundColor = board[row2][col2];
-        }, 500);
+    if (squareIdBeingReplaced >= 0 && squareIdBeingReplaced < width * width) {
+      colorBeingReplaced = squares[squareIdBeingReplaced].style.backgroundImage;
+      squares[squareIdBeingReplaced].style.backgroundImage = colorBeingDragged;
+      squares[squareIdBeingDragged].style.backgroundImage = colorBeingReplaced;
+      dragEnd(); // Reuse dragEnd logic
     }
-}
+  }
 
-// Verificar combinações
-function checkMatch(row, col) {
-    const color = board[row][col];
-    const horizontalMatch = checkHorizontalMatch(row, col, color);
-    const verticalMatch = checkVerticalMatch(row, col, color);
-    return horizontalMatch || verticalMatch;
-}
+  // Move candies para baixo
+  function moveIntoSquareBelow() {
+    for (i = 0; i < 55; i++) {
+      if (squares[i + width].style.backgroundImage === '') {
+        squares[i + width].style.backgroundImage = squares[i].style.backgroundImage;
+        squares[i].style.backgroundImage = '';
+        const firstRow = [0, 1, 2, 3, 4, 5, 6, 7];
+        const isFirstRow = firstRow.includes(i);
+        if (isFirstRow && squares[i].style.backgroundImage === '') {
+          let randomColor = Math.floor(Math.random() * candyColors.length);
+          squares[i].style.backgroundImage = candyColors[randomColor];
+        }
+      }
+    }
+  }
 
-// Verificar combinação horizontal
-function checkHorizontalMatch(row, col, color) {
-    let count = 0;
-    for (let i = col; i < boardSize && board[row][i] === color; i++) count++;
-    for (let i = col - 1; i >= 0 && board[row][i] === color; i--) count++;
-    return count >= 3;
-}
+  // Verificações para Matches (as existentes)
+  function checkRowForFour() {
+    for (i = 0; i < 60; i++) {
+      let rowOfFour = [i, i + 1, i + 2, i + 3];
+      let decidedColor = squares[i].style.backgroundImage;
+      const isBlank = squares[i].style.backgroundImage === '';
 
-// Verificar combinação vertical
-function checkVerticalMatch(row, col, color) {
-    let count = 0;
-    for (let i = row; i < boardSize && board[i][col] === color; i++) count++;
-    for (let i = row - 1; i >= 0 && board[i][col] === color; i--) count++;
-    return count >= 3;
-}
+      const notValid = [5, 6, 7, 13, 14, 15, 21, 22, 23, 29, 30, 31, 37, 38, 39, 45, 46, 47, 53, 54, 55];
+      if (notValid.includes(i)) continue;
 
-// Animação de desaparecimento e substituição das peças
-function animateAndReplacePiece(row, col) {
-    const piece = document.querySelector(`[data-row='${row}'][data-col='${col}']`);
-    piece.style.opacity = 0;
-    setTimeout(() => {
-        piece.style.opacity = 1;
-        piece.style.backgroundColor = getRandomColor();
-    }, 300);
-}
+      if (rowOfFour.every(index => squares[index].style.backgroundImage === decidedColor && !isBlank)) {
+        updateScore(4);
+        rowOfFour.forEach(index => {
+          squares[index].style.backgroundImage = '';
+        });
+      }
+    }
+  }
 
+  // (As restantes funções `checkColumnForFour`, `checkRowForThree`, etc.)
 
-
-
-
+  // Intervalo para verificações contínuas
+  window.setInterval(function () {
+    checkRowForFour();
+    // (Adicione as outras funções aqui)
+    moveIntoSquareBelow();
+  }, 100);
+});
