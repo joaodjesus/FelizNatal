@@ -93,6 +93,31 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateScore(points) {
     score += points;
     scoreDisplay.innerHTML = score;
+
+    if (score >= 50) {
+      // Show the congratulatory message
+      const messageBox = document.createElement('div');
+      messageBox.style.position = 'fixed';
+      messageBox.style.top = '50%';
+      messageBox.style.left = '50%';
+      messageBox.style.transform = 'translate(-50%, -50%)';
+      messageBox.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+      messageBox.style.color = 'white';
+      messageBox.style.padding = '20px';
+      messageBox.style.borderRadius = '10px';
+      messageBox.style.fontSize = '24px';
+      messageBox.style.textAlign = 'center';
+      messageBox.style.zIndex = '1000';
+      messageBox.innerHTML = 'És um espanto 😘';
+
+      // Append the message box to the body
+      document.body.appendChild(messageBox);
+
+      // Redirect after 2 seconds
+      setTimeout(() => {
+        window.location.href = 'pagina8.html';  // Redirect to pagina8.html
+      }, 2000); // Wait 2 seconds before redirecting
+    }
   }
 
   function moveIntoSquareBelow() {
